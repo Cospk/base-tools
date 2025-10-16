@@ -1,0 +1,48 @@
+name: Release on Tag Push
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # 匹配 v1.0.0、v1.2.3 等语义化版本号
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取所有历史记录，用于生成完整的 changelog
+
+      - name: Get tag information
+        id: tag_info
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "📦 准备发布版本: $TAG_NAME"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag_info.outputs.tag_name }}
+          name: Release ${{ steps.tag_info.outputs.tag_name }}
+          generate_release_notes: true  # 自动生成 release notes（基于 PR 和 commits）
+          draft: false                  # 直接发布，不是草稿
+          prerelease: false             # 正式版本，不是预发布版本
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Success Notification
+        if: success()
+        run: |
+          echo "✅ Release ${{ steps.tag_info.outputs.tag_name }} 创建成功！"
+          echo "🔗 访问: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag_info.outputs.tag_name }}"
+
+      - name: Release Failed Notification
+        if: failure()
+        run: |
+          echo "❌ Release 创建失败，请检查日志"

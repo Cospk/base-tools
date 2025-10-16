@@ -1,0 +1,32 @@
+ #  gosec 是一个用于 Go 语言的源代码安全审计工具。它通过静态分析 Go 代码，查找潜在的安全问题。gosec 的主要功能包括：
+#
+#  1、发现常见的安全漏洞，例如 SQL 注入、命令注入以及跨站脚本攻击（XSS）。
+#  2、根据常见的安全标准对代码进行审计，查找不符合规范的代码。
+#  3、帮助 Go 语言工程师编写安全可靠的代码。
+#
+# https://github.com/securego/gosec/
+
+name: OpenIM Run Gosec
+on:
+  push:
+    branches: "*"
+  pull_request:
+    branches: "*"
+    paths-ignore:
+      - '*.md'
+      - '*.yml'
+      - '.github'
+
+jobs:
+  golang-security-action:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
+        continue-on-error: true

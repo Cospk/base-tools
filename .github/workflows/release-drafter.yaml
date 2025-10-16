@@ -1,0 +1,41 @@
+name: Release Drafter
+
+on:
+  push:
+    # 触发事件时要考虑的分支；可选，默认为全部
+    branches:
+      - main
+  # 仅当使用自动标签功能（autolabeler）时才需要 pull_request 事件
+  pull_request:
+  # 该 Action 只处理以下类型，但也可以设置为全部
+  # types: [opened, reopened, synchronize]
+  # 若要支持来自 fork 的 PR，自动标签功能需要 pull_request_target 事件
+  # pull_request_target:
+  #   types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  update_release_draft:
+    permissions:
+      # 创建 GitHub Release 需要 write 权限
+      contents: write
+      # 自动标签功能需要 write 权限
+      # 否则至少需要 read 权限
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      # （可选）GitHub Enterprise 需要设置 GHE_HOST 变量
+      #- name: 设置 GHE_HOST
+      #  run: |
+      #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
+
+      # 当 Pull Request 合并到 "master" 分支时，起草下一次的 Release Notes
+      - uses: release-drafter/release-drafter@v6
+        # （可选）指定要使用的配置文件名，相对路径为 .github/；默认值为 release-drafter.yml
+        # with:
+        #   config-name: my-config.yml
+        #   disable-autolabeler: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.REDBOT_GITHUB_TOKEN }}

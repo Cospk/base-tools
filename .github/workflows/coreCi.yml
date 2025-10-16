@@ -1,0 +1,49 @@
+name: base-tools ci Auto Build and Install
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+env:
+  GO_VERSION: 1.23.4
+
+jobs:
+  cospk-base-tools:
+    name: Test with go ${{ matrix.go_version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      matrix:
+        go_version: [ "1.23.4" ]
+        os: [ ubuntu-latest ]
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.go_version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go_version }}
+        id: go
+
+      - name: Module Operations
+        run: |
+          sudo make tidy
+          sudo make tools.verify.go-gitlint
+
+      - name: Format Code
+        run: sudo make lint
+        continue-on-error: true
+
+      - name: test
+        run: sudo make test
+
+      - name: Collect and Display Test Coverage
+        id: collect_coverage
+        run: |
+          sudo make cover
