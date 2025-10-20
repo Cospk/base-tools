@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Setup
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go ${{ matrix.go_version }}
         uses: actions/setup-go@v5
@@ -31,19 +33,33 @@ jobs:
           go-version: ${{ matrix.go_version }}
         id: go
 
+      - name: Unshallow history (safety)
+        run: |
+          if [ -f .git/shallow ]; then
+            git fetch --prune --unshallow --tags
+          fi
+
       - name: Module Operations
         run: |
-          sudo make tidy
-          sudo make tools.verify.go-gitlint
+          make tidy
+          make tools.verify.go-gitlint
 
       - name: Format Code
-        run: sudo make lint
+        run: make lint
         continue-on-error: true
 
       - name: test
-        run: sudo make test
+        run: make test
 
       - name: Collect and Display Test Coverage
         id: collect_coverage
         run: |
-          sudo make cover
+          make cover
+
+      - name: Upload coverage to Codecov
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
+          flags: unittests
