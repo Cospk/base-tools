@@ -3,20 +3,17 @@ package log
 import (
 	"context"
 	"fmt"
+	"github.com/Cospk/base-tools/errs"
+	rotatelogs "github.com/Cospk/base-tools/log/file-rotatelogs"
+	"github.com/Cospk/base-tools/mcontext"
+	constant "github.com/Cospk/base-tools/utils/constants"
+	"github.com/Cospk/base-tools/utils/stringutil"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/openimsdk/tools/errs"
-
-	rotatelogs "github.com/openimsdk/tools/log/file-rotatelogs"
-	"github.com/openimsdk/tools/utils/stringutil"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	"github.com/openimsdk/protocol/constant"
-	"github.com/openimsdk/tools/mcontext"
 )
 
 var (

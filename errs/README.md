@@ -73,7 +73,7 @@ type CodeRelation interface {
 ```go
 package main
 
-import "github.com/openimsdk/tools/errs"
+import "github.com/Cospk/base-tools/errs"
 
 // 定义业务错误码
 const (

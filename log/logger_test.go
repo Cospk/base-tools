@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"github.com/Cospk/base-tools/errs"
 	"io"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/openimsdk/protocol/constant"
-	"github.com/openimsdk/tools/errs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,9 +37,9 @@ func TestContextPropagation(t *testing.T) {
 
 	// 创建带有上下文信息的 context
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, constant.OperationID, "test-operation-123")
-	ctx = context.WithValue(ctx, constant.OpUserID, "user-456")
-	ctx = context.WithValue(ctx, constant.ConnID, "conn-789")
+	ctx = context.WithValue(ctx, "OperationID", "test-operation-123")
+	ctx = context.WithValue(ctx, "OpUserID", "user-456")
+	ctx = context.WithValue(ctx, "ConnID", "conn-789")
 
 	// 记录日志
 	ZInfo(ctx, "test message with context", "key", "value")
@@ -504,8 +503,8 @@ func BenchmarkWithContext(b *testing.B) {
 	defer Flush()
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, constant.OperationID, "bench-op-123")
-	ctx = context.WithValue(ctx, constant.OpUserID, "bench-user-456")
+	ctx = context.WithValue(ctx, "OperationID", "bench-op-123")
+	ctx = context.WithValue(ctx, "OpUserID", "bench-user-456")
 
 	b.ResetTimer()
 

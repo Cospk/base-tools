@@ -44,7 +44,7 @@
 package main
 
 import (
-    "github.com/openimsdk/tools/log"
+    "github.com/Cospk/base-tools/log"
 )
 
 func main() {
@@ -77,7 +77,7 @@ func main() {
 ```go
 import (
     "context"
-    "github.com/openimsdk/tools/log"
+    "github.com/Cospk/base-tools/log"
 )
 
 func Example() {
