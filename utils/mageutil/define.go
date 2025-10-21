@@ -2,8 +2,8 @@ package mageutil
 
 import (
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
+	"os"
 	"runtime"
 )
 
@@ -20,7 +20,7 @@ type Config struct {
 }
 
 func InitForSSC() {
-	yamlFile, err := ioutil.ReadFile("start-config.yml")
+	yamlFile, err := os.ReadFile("start-config.yml")
 	if err != nil {
 		log.Fatalf("error reading YAML file: %v", err)
 	}

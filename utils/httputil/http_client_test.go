@@ -14,7 +14,9 @@ func TestHTTPClient_Get(t *testing.T) {
 	// Setup a mock server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("mock response"))
+		if _, err := w.Write([]byte("mock response")); err != nil {
+			t.Fatalf("write response failed: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -37,7 +39,9 @@ func TestHTTPClient_Post(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to read request body: %v", err)
 		}
-		w.Write(body)
+		if _, err := w.Write(body); err != nil {
+			t.Fatalf("write response failed: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -67,7 +71,9 @@ func TestHTTPClient_PostReturn(t *testing.T) {
 	expectedOutput := struct{ Key string }{"value"}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(expectedOutput)
+		if err := json.NewEncoder(w).Encode(expectedOutput); err != nil {
+			t.Fatalf("encode response failed: %v", err)
+		}
 	}))
 	defer server.Close()
 

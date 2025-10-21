@@ -146,7 +146,10 @@ func TestLogRotate(t *testing.T) {
 			clock.Advance(7 * 24 * time.Hour)
 
 			// This next Write() should trigger Rotate()
-			rl.Write([]byte(str))
+			if _, err := rl.Write([]byte(str)); err != nil {
+				t.Errorf("rl.Write failed: %v", err)
+				return
+			}
 			newfn := rl.CurrentFileName()
 			if newfn == fn {
 				t.Errorf(`New file name and old file name should not match ("%s" != "%s")`, fn, newfn)
@@ -185,8 +188,12 @@ func CreateRotationTestFile(dir string, base time.Time, d time.Duration, n int) 
 		// %Y%m%d%H%M%S
 		suffix := timestamp.Format("20060102150405")
 		path := filepath.Join(dir, "log"+suffix)
-		ioutil.WriteFile(path, []byte("rotation test file\n"), os.ModePerm)
-		os.Chtimes(path, timestamp, timestamp)
+		if err := os.WriteFile(path, []byte("rotation test file\n"), os.ModePerm); err != nil {
+			panic(err)
+		}
+		if err := os.Chtimes(path, timestamp, timestamp); err != nil {
+			panic(err)
+		}
 		timestamp = timestamp.Add(d)
 	}
 }
@@ -242,11 +249,8 @@ func TestLogRotationCount(t *testing.T) {
 		}
 		defer rl.Close()
 
-		n, err := rl.Write([]byte("dummy"))
-		if !assert.NoError(t, err, "rl.Write should succeed") {
-			return
-		}
-		if !assert.Len(t, "dummy", n, "rl.Write should succeed") {
+		if _, err := rl.Write([]byte("dummy")); err != nil {
+			t.Errorf("rl.Write failed: %v", err)
 			return
 		}
 		time.Sleep(time.Second)
@@ -269,11 +273,8 @@ func TestLogRotationCount(t *testing.T) {
 		}
 		defer rl.Close()
 
-		n, err := rl.Write([]byte("dummy"))
-		if !assert.NoError(t, err, "rl.Write should succeed") {
-			return
-		}
-		if !assert.Len(t, "dummy", n, "rl.Write should succeed") {
+		if _, err := rl.Write([]byte("dummy")); err != nil {
+			t.Errorf("rl.Write failed: %v", err)
 			return
 		}
 		time.Sleep(time.Second)
@@ -342,7 +343,8 @@ func TestGHIssue16(t *testing.T) {
 		return
 	}
 
-	if !assert.NoError(t, rl.Rotate(), "rl.Rotate should succeed") {
+	if err := rl.Rotate(); err != nil {
+		t.Errorf("rl.Rotate failed: %v", err)
 		return
 	}
 	defer rl.Close()
@@ -365,8 +367,12 @@ func TestRotationGenerationalNames(t *testing.T) {
 
 		seen := map[string]struct{}{}
 		for i := 0; i < 10; i++ {
-			rl.Write([]byte("Hello, World!"))
-			if !assert.NoError(t, rl.Rotate(), "rl.Rotate should succeed") {
+			if _, err := rl.Write([]byte("Hello, World!")); err != nil {
+				t.Errorf("rl.Write failed: %v", err)
+				return
+			}
+			if err := rl.Rotate(); err != nil {
+				t.Errorf("rl.Rotate failed: %v", err)
 				return
 			}
 
@@ -377,7 +383,10 @@ func TestRotationGenerationalNames(t *testing.T) {
 			if !assert.True(t, strings.HasPrefix(fn, "unchanged-pattern.log"), "prefix for all filenames should match") {
 				return
 			}
-			rl.Write([]byte("Hello, World!"))
+			if _, err := rl.Write([]byte("Hello, World!")); err != nil {
+				t.Errorf("rl.Write failed: %v", err)
+				return
+			}
 			suffix := strings.TrimPrefix(fn, "unchanged-pattern.log")
 			expectedSuffix := fmt.Sprintf(".%d", i+1)
 			if !assert.True(t, suffix == expectedSuffix, "expected suffix %s found %s", expectedSuffix, suffix) {
@@ -413,8 +422,12 @@ func TestRotationGenerationalNames(t *testing.T) {
 
 		for i := 0; i < 10; i++ {
 			time.Sleep(time.Second)
-			rl.Write([]byte("Hello, World!"))
-			if !assert.NoError(t, rl.Rotate(), "rl.Rotate should succeed") {
+			if _, err := rl.Write([]byte("Hello, World!")); err != nil {
+				t.Errorf("rl.Write failed: %v", err)
+				return
+			}
+			if err := rl.Rotate(); err != nil {
+				t.Errorf("rl.Rotate failed: %v", err)
 				return
 			}
 
@@ -474,7 +487,10 @@ func TestGHIssue23(t *testing.T) {
 				}
 
 				t.Logf("expected %s", test.Expected)
-				rl.Rotate()
+				if err := rl.Rotate(); err != nil {
+					t.Errorf("rl.Rotate failed: %v", err)
+					return
+				}
 				if !assert.Equal(t, test.Expected, rl.CurrentFileName(), "file names should match") {
 					return
 				}

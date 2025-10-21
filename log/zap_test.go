@@ -38,7 +38,7 @@ func TestSDKLog(t *testing.T) {
 	os.Stdout = w
 
 	logger := zap.NewExample()
-	defer logger.Sync()
+	defer func() { _ = logger.Sync() }()
 
 	ZDebug(context.Background(), "hello")
 	SDKLog(context.Background(), 5, "cmd/abc.go", 666, "This is a test message", nil, []any{"key", "value"})

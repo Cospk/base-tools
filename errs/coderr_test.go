@@ -542,12 +542,16 @@ func TestCodeRelation_Add(t *testing.T) {
 }
 
 func TestCodeRelation_Is(t *testing.T) {
-	cr := newCodeRelation()
+    cr := newCodeRelation()
 
-	// 设置错误码关系：1000 -> 1001 -> 1002 -> 1003
-	cr.Add(1000, 1001, 1002, 1003)
-	// 设置错误码关系：2000 -> 2001
-	cr.Add(2000, 2001)
+    // 设置错误码关系：1000 -> 1001 -> 1002 -> 1003
+    if err := cr.Add(1000, 1001, 1002, 1003); err != nil {
+        t.Fatalf("Add() failed: %v", err)
+    }
+    // 设置错误码关系：2000 -> 2001
+    if err := cr.Add(2000, 2001); err != nil {
+        t.Fatalf("Add() failed: %v", err)
+    }
 
 	tests := []struct {
 		name   string

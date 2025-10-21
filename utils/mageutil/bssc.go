@@ -3,7 +3,6 @@ package mageutil
 import (
 	"fmt"
 	"github.com/magefile/mage/sh"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,7 +94,7 @@ func createStartConfigYML(cmdDirs, toolsDirs []string) {
 	}
 	content.WriteString("maxFileDescriptors: 10000\n")
 
-	err := ioutil.WriteFile(configPath, []byte(content.String()), 0644)
+	err := os.WriteFile(configPath, []byte(content.String()), 0644)
 	if err != nil {
 		PrintRed("Failed to create start-config.yml: " + err.Error())
 		return

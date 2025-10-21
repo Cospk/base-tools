@@ -142,8 +142,7 @@ func IntersectString(slice1, slice2 []string) []string {
 		m[v] = true
 	}
 	for _, v := range slice2 {
-		flag, _ := m[v]
-		if flag {
+		if m[v] {
 			n = append(n, v)
 		}
 	}
@@ -180,8 +179,7 @@ func Intersect(slice1, slice2 []int64) []int64 {
 		m[v] = true
 	}
 	for _, v := range slice2 {
-		flag, _ := m[v]
-		if flag {
+		if m[v] {
 			n = append(n, v)
 		}
 	}

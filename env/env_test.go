@@ -364,7 +364,9 @@ func BenchmarkGetInt(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		GetInt("BENCH_INT", 0)
+		if _, err := GetInt("BENCH_INT", 0); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -375,7 +377,9 @@ func BenchmarkGetFloat64(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		GetFloat64("BENCH_FLOAT", 0.0)
+		if _, err := GetFloat64("BENCH_FLOAT", 0.0); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -386,7 +390,9 @@ func BenchmarkGetBool(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		GetBool("BENCH_BOOL", false)
+		if _, err := GetBool("BENCH_BOOL", false); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 

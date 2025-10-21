@@ -410,7 +410,9 @@ func TestConsoleLogger(t *testing.T) {
 
 	// 读取输出
 	var buf bytes.Buffer
-	io.Copy(&buf, r)
+	if _, err := io.Copy(&buf, r); err != nil {
+		t.Fatalf("io.Copy failed: %v", err)
+	}
 	output := buf.String()
 
 	// 验证控制台输出

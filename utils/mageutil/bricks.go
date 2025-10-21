@@ -110,7 +110,7 @@ func CheckBinariesRunning() error {
 
 // PrintListenedPortsByBinaries iterates over all binary files and prints the ports they are listening on.
 func PrintListenedPortsByBinaries() {
-	for binary, _ := range serviceBinaries {
+	for binary := range serviceBinaries {
 		basePath := GetBinFullPath(binary)
 		fullPath := basePath
 		PrintBinaryPorts(fullPath)
