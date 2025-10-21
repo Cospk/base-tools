@@ -392,10 +392,13 @@ func TestConfigChange(t *testing.T) {
 		t.Errorf("初始值错误，期望: initial, 实际: %s", v)
 	}
 
-	// 设置变更标志
-	changed := false
+	// 使用通道等待回调触发，避免数据竞争
+	done := make(chan struct{}, 1)
 	vc.OnConfigChange(func() {
-		changed = true
+		select {
+		case done <- struct{}{}:
+		default:
+		}
 	})
 	vc.WatchConfig()
 
@@ -406,11 +409,11 @@ func TestConfigChange(t *testing.T) {
 		t.Fatalf("更新配置文件失败: %v", err)
 	}
 
-	// 等待文件系统事件
-	time.Sleep(100 * time.Millisecond)
-
-	// 验证回调被触发
-	if !changed {
+	// 验证回调被触发（带超时，避免不支持的环境卡住）
+	select {
+	case <-done:
+		// ok
+	case <-time.After(2 * time.Second):
 		t.Skip("配置变更监听测试跳过（可能是文件系统不支持）")
 	}
 }

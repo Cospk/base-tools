@@ -6,7 +6,7 @@ ifeq ($(strip $(GOBIN)),)
   GOBIN := $(HOME)/go/bin
 endif
 
-.PHONY: all tidy fmt vet lint test cover tools.verify.go-gitlint tools.install.golangci tools.install.go-gitlint
+.PHONY: all tidy fmt vet lint test test.changed cover tools.verify.go-gitlint tools.install.golangci tools.install.go-gitlint
 
 all: tidy fmt vet lint test cover
 
@@ -62,9 +62,13 @@ tools.verify.go-gitlint: tools.install.go-gitlint
 		exit 127; \
 	fi
 
-## 启用竞态检测并生成覆盖率文件的测试
+## 启用竞态检测并生成覆盖率文件的测试（测试所有包）
 test:
 	go test ./... -race -coverprofile=coverage.out -covermode=atomic
+
+## 只测试变更的包（用于 CI 增量测试）
+test.changed:
+	@bash scripts/test-changed-packages.sh
 
 ## 显示覆盖率摘要（若不存在则先生成）
 cover:

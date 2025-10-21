@@ -496,15 +496,32 @@ func (l *ZapLogger) Panic(ctx context.Context, msg string, err error, keysAndVal
 
 // kvAppend 向键值对切片追加上下文信息(operationID, userID等)
 func (l *ZapLogger) kvAppend(ctx context.Context, keysAndValues []any) []any {
-	if ctx == nil {
-		return keysAndValues
-	}
-	operationID := mcontext.GetOperationID(ctx)
-	opUserID := mcontext.GetOpUserID(ctx)
-	connID := mcontext.GetConnID(ctx)
-	triggerID := mcontext.GetTriggerID(ctx)
-	opUserPlatform := mcontext.GetOpUserPlatform(ctx)
-	remoteAddr := mcontext.GetRemoteAddr(ctx)
+    if ctx == nil {
+        return keysAndValues
+    }
+    operationID := mcontext.GetOperationID(ctx)
+    opUserID := mcontext.GetOpUserID(ctx)
+    connID := mcontext.GetConnID(ctx)
+    triggerID := mcontext.GetTriggerID(ctx)
+    opUserPlatform := mcontext.GetOpUserPlatform(ctx)
+    remoteAddr := mcontext.GetRemoteAddr(ctx)
+
+    // 兼容测试或外部代码使用原始字符串键注入上下文的场景
+    if operationID == "" {
+        if v, ok := ctx.Value("OperationID").(string); ok {
+            operationID = v
+        }
+    }
+    if opUserID == "" {
+        if v, ok := ctx.Value("OpUserID").(string); ok {
+            opUserID = v
+        }
+    }
+    if connID == "" {
+        if v, ok := ctx.Value("ConnID").(string); ok {
+            connID = v
+        }
+    }
 
 	if l.isSimplify {
 		if len(keysAndValues)%2 == 0 {
@@ -518,11 +535,11 @@ func (l *ZapLogger) kvAppend(ctx context.Context, keysAndValues []any) []any {
 		}
 	}
 
-	if opUserID != "" {
-		keysAndValues = append([]any{constant.OpUserID, opUserID}, keysAndValues...)
-	}
-	if operationID != "" {
-		keysAndValues = append([]any{constant.OperationID, operationID}, keysAndValues...)
+    if opUserID != "" {
+        keysAndValues = append([]any{constant.OpUserID, opUserID}, keysAndValues...)
+    }
+    if operationID != "" {
+        keysAndValues = append([]any{constant.OperationID, operationID}, keysAndValues...)
 	}
 	if connID != "" {
 		keysAndValues = append([]any{constant.ConnID, connID}, keysAndValues...)

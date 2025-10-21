@@ -8,7 +8,8 @@ on:
     branches: [ main ]
 
 env:
-  GO_VERSION: 1.23.4
+  GO_VERSION: 1.24.7
+  GOTOOLCHAIN: local
 
 jobs:
   cospk-base-tools:
@@ -19,13 +20,13 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        go_version: [ "1.23.4" ]
+        go_version: [ "1.24.7" ]
         os: [ ubuntu-latest ]
     steps:
       - name: Setup
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 需要完整历史以便对比变更
 
       - name: Set up Go ${{ matrix.go_version }}
         uses: actions/setup-go@v5
@@ -48,8 +49,12 @@ jobs:
         run: make lint
         continue-on-error: true
 
-      - name: test
-        run: make test
+      - name: Test Changed Packages
+        run: make test.changed
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
 
       - name: Collect and Display Test Coverage
         id: collect_coverage

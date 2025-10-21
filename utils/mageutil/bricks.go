@@ -1,6 +1,7 @@
 package mageutil
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -101,8 +102,8 @@ func CheckBinariesRunning() error {
 	}
 
 	if len(errorMessages) > 0 {
-		return fmt.Errorf(strings.Join(errorMessages, "\n"))
-	}
+        return errors.New(strings.Join(errorMessages, "\n"))
+    }
 
 	return nil
 }
